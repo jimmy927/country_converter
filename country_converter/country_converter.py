@@ -428,11 +428,23 @@ class CountryConverter:
                 ret = data
                 test_for_unique_names(data)
             else:
+                # pandas 3.1 turns "NA" and empty cells into NaN even with
+                # str converters: keep "NA" (Namibia) as text, but keep empty
+                # cells of the non-string columns as NaN.
+                header = pd.read_csv(
+                    data, sep="\t", encoding="utf-8", nrows=0
+                ).columns
+                if hasattr(data, "seek"):
+                    data.seek(0)
                 ret = pd.read_csv(
                     data,
                     sep="\t",
                     encoding="utf-8",
                     converters={str_col: str for str_col in must_be_string},
+                    keep_default_na=False,
+                    na_values={
+                        col: [""] for col in header if col not in must_be_string
+                    },
                 )
                 test_for_unique_names(ret, data)
             return ret

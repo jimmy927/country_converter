@@ -5,6 +5,7 @@
 ### Development
 
 - removed htmlcov
+- fix reading of the country data with pandas 3.1.0 ("NA" for Namibia was read as NaN)
 
 ### Classifications
 
